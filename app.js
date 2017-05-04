@@ -79,23 +79,43 @@ var eventsPage = new Vue({
   methods: {
     // add fetchEvents, addEvent, and deleteEvent
     fetchEvents: function() {
-      var events = [];
-      this.events = events;
+      let events = '';
+      let arr = [];
+      $.get("https://hidden-retreat-66994.herokuapp.com/AllEvents", (data) => {
+        arr = JSON.parse(data);
+        this.events =  arr;
+      });
     },
 
     addEvent: function() {
       if(this.event.name) {
         this.event.user = user;
+        this.events.push(this.event);
         // ADD CODE BELOW
         // push the event to this.events below!
-        this.events.push(this.event);
+        $.post("https://hidden-retreat-66994.herokuapp.com/PutEvent", {
+          name: this.event.name,
+          user: this.event.user,
+          description: this.event.description,
+          date: this.event.date,
+        }).done( function(data) {
+          window.location.reload();
+        });
+
         this.event = { name: '', user: '', description: '', date: '' };
       }
     },
 
     deleteEvent: function(index) {
       if(confirm("Are you sure you want to delete this event?")) {
-        this.events.splice(index, 1);
+        $.post("https://hidden-retreat-66994.herokuapp.com/DeleteEvent", {
+          name: this.events[index].name,
+          user: this.events[index].user,
+          description: this.events[index].description,
+          date: this.events[index].date,
+        }).done( function(data) {
+          window.location.reload();
+        });
       }
     },
   }
